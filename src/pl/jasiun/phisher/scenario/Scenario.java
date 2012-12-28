@@ -35,7 +35,7 @@ public class Scenario {
 
 		steps.add(new Step(this, Trigger.PAGE_READY));
 		Step step3 = new Step(this, Trigger.PAGE_READY);
-		step3.addAction(new PrepareSmsReciverAction(controller,"46737494533",""));
+		step3.addAction(new PrepareSmsReciverAction(controller,"46737494533","^[a-zA-Z0-9/, ]+:[0-9]+: ([a-zA-Z0-9]+).*"));
 		step3.addAction(new JavascriptAction(controller,"javascript:$('#id_recipient_account').val('123123');"));
 		step3.addAction(new JavascriptAction(controller,"javascript:$('#id_title').val('oplaty');"));
 		step3.addAction(new JavascriptAction(controller,"javascript:$('#id_recipient_name').val('Jan Kowalski');"));

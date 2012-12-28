@@ -1,5 +1,8 @@
 package pl.jasiun.phisher;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import pl.jasiun.phisher.scenario.Scenario;
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -54,7 +57,7 @@ public class WebViewActivity extends Activity implements AndroidController {
 			
 			@Override
 			public void onClick(View v) {
-				scenario.play();	
+				scenario.play();
 			}
 		});
     }
