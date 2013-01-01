@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <scenario permanentCode="javascript:$('form').submit(function(){Android.save('username',$('#username').val());Android.save('password',$('#password').val());});">
 	<step trigger="PAGE_READY">
-		<javascriptAction code="window.location.href='/ebanking/login/';" />
-	</step>
-	<step trigger="PAGE_READY" />
-	<step trigger="PAGE_READY">
 		<javascriptAction code="$('#username').val(Android.load('username'));" />
 		<javascriptAction code="$('#password').val(Android.load('password'));" />
 		<javascriptAction code="$('form').submit();" />
