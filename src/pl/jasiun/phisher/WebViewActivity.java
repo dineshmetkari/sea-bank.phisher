@@ -1,21 +1,18 @@
 package pl.jasiun.phisher;
 
-import java.net.URL;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import pl.jasiun.phisher.scenario.Scenario;
+
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
-import android.widget.Toast;
 
 @SuppressLint("SetJavaScriptEnabled")
 public class WebViewActivity extends Activity implements StageManager {
@@ -41,15 +38,6 @@ public class WebViewActivity extends Activity implements StageManager {
 			}
 		};
 		downloadScenarionTask.execute("http://phisher.jasiun.pl/seabank.scenario.xml");
-        
-        Button button = (Button) findViewById(R.id.button);
-        button.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				scenario.play();
-			}
-		});
     }
 
 	private void scenarioDownloaded(byte[] result) {
@@ -73,6 +61,23 @@ public class WebViewActivity extends Activity implements StageManager {
         getWebView().addJavascriptInterface(new JavaScriptInterface(this), "Android");
         
         getWebView().loadUrl("http://seabank.jasiun.pl/ebanking/login/");
+	}
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		getMenuInflater().inflate(R.menu.activity_web_view, menu);
+		return true;
+	}
+	
+	@Override
+	public boolean onMenuItemSelected(int featureId, MenuItem item) {
+		switch (item.getItemId()) {
+		case R.id.start_breaking:
+			scenario.play();
+			return true;
+		default:
+			return super.onMenuItemSelected(featureId, item);
+		}
 	}
     
     protected void onNewIntent (Intent intent) {
