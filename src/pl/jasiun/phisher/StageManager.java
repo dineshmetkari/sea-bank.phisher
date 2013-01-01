@@ -2,7 +2,7 @@ package pl.jasiun.phisher;
 
 import android.content.Intent;
 
-public interface AndroidController {
+public interface StageManager {
 	
 	public void sendIntent(Intent intent);
 	
